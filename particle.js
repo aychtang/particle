@@ -1,3 +1,5 @@
+(function(){
+
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 canvas.height = document.height;
@@ -15,22 +17,31 @@ var makeParticle = function() {
 	var originX = cursorPosition && cursorPosition.offsetX || document.width / 2;
 	var originY = cursorPosition && cursorPosition.offsetY || document.height / 2;
 	var particle = {};
-	var getRandomArbitary = function(min, max) {
-    return Math.random() * (max - min) + min;
-	}
 
+	var randomRange = function(min, max) {
+		return Math.random() * (max - min) + min;
+	};
+
+	// Initialises position at mouse position or center and gives random x + y velocity.
 	particle.x = originX;
 	particle.y = originY;
-	particle.vx = getRandomArbitary(-15, 15);
-	particle.vy = getRandomArbitary(-15, 15);
-	particle.size = 5;
+	particle.vx = randomRange(-15, 15);
+	particle.vy = randomRange(-15, 15);
+	particle.size = 2;
 
 	// Each step increment values by velocities.
 	particle.update = function() {
 		particle.x += particle.vx;
 		particle.y += particle.vy;
-		particle.size -= 0.1;
-		if (particle.x > canvas.width || particle.x < 0 || particle.y > canvas.height || particle.y < 0 || particle.size < 0.1) {
+		particle.size -= 0.025;
+
+		// Gameover.
+		if (particle.x > canvas.width || particle.x < 0 || particle.y > canvas.height || particle.y < 0) {
+			particle.vx = ~particle.vx;
+			particle.vy = ~particle.vy;
+		}
+
+		if (particle.size < 0.1) {
 			particleArray.splice(particleArray.indexOf(particle), 1);
 		}
 	};
@@ -41,7 +52,7 @@ var makeParticle = function() {
 var main = function() {
 	requestAnimationFrame(main);
 	drawBoard();
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < 30; i++) {
 		particleArray.push(makeParticle());
 	}
 
@@ -65,3 +76,7 @@ initialise();
 $(canvas).mousemove(function(e) {
 	cursorPosition = e;
 });
+
+
+}())
+
